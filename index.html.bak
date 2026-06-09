@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShieldLayer — Africa's AI Security Infrastructure</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Clash+Display:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#020509;--s1:#060d14;--s2:#0a1520;--s3:#0f1e2e;
+  --border:#162030;--border2:#1d2e42;
+  --gold:#f5b800;--gold2:#ff8c00;
+  --teal:#00d4aa;--teal2:#00a896;
+  --blue:#0077ff;--blue2:#0055cc;
+  --red:#ff3a3a;--warn:#ff8c00;
+  --text:#ddeeff;--muted:#4a6a8a;--sub:#2a4a6a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;overflow-x:hidden;}
+
+/* Animated background */
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,170,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,170,0.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0;}
+.bg-orb1{position:fixed;top:-20%;left:-10%;width:700px;height:700px;background:radial-gradient(circle,rgba(245,184,0,0.06),transparent 60%);pointer-events:none;z-index:0;}
+.bg-orb2{position:fixed;bottom:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(0,212,170,0.06),transparent 60%);pointer-events:none;z-index:0;}
+
+/* Nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 64px;display:flex;align-items:center;justify-content:space-between;background:rgba(2,5,9,0.85);backdrop-filter:blur(24px);border-bottom:1px solid rgba(0,212,170,0.06);}
+.nav-brand{display:flex;align-items:center;gap:10px;}
+.nav-logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.nav-brand-name{font-weight:700;font-size:18px;letter-spacing:-0.3px;}
+.nav-brand-name span{color:var(--gold);}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color .15s;}
+.nav-links a:hover{color:var(--text);}
+.nav-actions{display:flex;gap:10px;align-items:center;}
+.btn-nav{padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;color:#020509;}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,184,0,0.3);}
+
+/* Hero */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;z-index:1;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(245,184,0,0.08);border:1px solid rgba(245,184,0,0.2);color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;padding:6px 14px;border-radius:4px;margin-bottom:32px;letter-spacing:1.5px;animation:fadeUp .5s ease both;}
+.hero h1{font-size:clamp(48px,8vw,100px);font-weight:700;line-height:1;letter-spacing:-2px;margin-bottom:24px;animation:fadeUp .5s .1s ease both;}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:17px;color:var(--muted);max-width:540px;line-height:1.7;margin-bottom:48px;font-weight:400;animation:fadeUp .5s .2s ease both;}
+.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .5s .3s ease both;}
+.btn-hero-gold{padding:14px 32px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:8px;color:#020509;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-hero-gold:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(245,184,0,0.35);}
+.btn-hero-outline{padding:14px 32px;background:transparent;border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-hero-outline:hover{border-color:var(--teal);color:var(--teal);}
+
+/* Stats */
+.stats{display:flex;gap:0;justify-content:center;margin-top:80px;border:1px solid var(--border);border-radius:16px;overflow:hidden;animation:fadeUp .5s .4s ease both;background:var(--s1);}
+.stat{padding:28px 48px;text-align:center;border-right:1px solid var(--border);}
+.stat:last-child{border-right:none;}
+.stat-val{font-size:36px;font-weight:700;letter-spacing:-1px;}
+.stat-val.gold{color:var(--gold);}
+.stat-val.teal{color:var(--teal);}
+.stat-val.blue{color:var(--blue);}
+.stat-val.red{color:var(--red);}
+.stat-label{font-size:12px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* Products */
+.products{padding:100px 64px;max-width:1280px;margin:0 auto;position:relative;z-index:1;}
+.sec-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+.sec-title{font-size:clamp(36px,4vw,56px);font-weight:700;letter-spacing:-1.5px;line-height:1.05;margin-bottom:16px;}
+.sec-sub{font-size:16px;color:var(--muted);max-width:500px;line-height:1.6;margin-bottom:64px;}
+
+.product-cards{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);border-radius:20px;overflow:hidden;}
+.product-card{background:var(--s1);padding:48px;position:relative;overflow:hidden;transition:background .2s;}
+.product-card:hover{background:var(--s2);}
+.product-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.gold-card::before{background:linear-gradient(90deg,var(--gold),var(--gold2));}
+.teal-card::before{background:linear-gradient(90deg,var(--teal),var(--blue));}
+.product-badge{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:10px;padding:4px 10px;border-radius:4px;margin-bottom:20px;letter-spacing:1px;}
+.badge-gold{background:rgba(245,184,0,0.1);color:var(--gold);border:1px solid rgba(245,184,0,0.2);}
+.badge-teal{background:rgba(0,212,170,0.1);color:var(--teal);border:1px solid rgba(0,212,170,0.2);}
+.product-name{font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:8px;}
+.product-tagline{font-size:15px;color:var(--muted);line-height:1.6;margin-bottom:28px;}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:32px;}
+.feat{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.feat i{font-size:14px;flex-shrink:0;}
+.gold-card .feat i{color:var(--gold);}
+.teal-card .feat i{color:var(--teal);}
+.product-card:hover .feat{background:var(--s3);}
+.btn-product{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;text-decoration:none;display:inline-block;}
+.btn-gold-fill{background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;color:#020509;}
+.btn-gold-fill:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(245,184,0,0.3);}
+.btn-teal-fill{background:linear-gradient(135deg,var(--teal),var(--teal2));border:none;color:#020509;}
+.btn-teal-fill:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,212,170,0.3);}
+.product-glow{position:absolute;bottom:-80px;right:-80px;width:250px;height:250px;border-radius:50%;pointer-events:none;opacity:.5;}
+.gold-glow{background:radial-gradient(circle,rgba(245,184,0,0.12),transparent 70%);}
+.teal-glow{background:radial-gradient(circle,rgba(0,212,170,0.12),transparent 70%);}
+
+/* Differentiators */
+.diff-section{padding:100px 64px;background:var(--s1);border-top:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;z-index:1;}
+.diff-inner{max-width:1280px;margin:0 auto;}
+.diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:16px;overflow:hidden;margin-top:56px;}
+.diff-card{background:var(--bg);padding:36px 32px;}
+.diff-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px;}
+.diff-title{font-size:16px;font-weight:600;margin-bottom:8px;}
+.diff-text{font-size:13px;color:var(--muted);line-height:1.7;}
+
+/* Pricing */
+.pricing{padding:100px 64px;max-width:1280px;margin:0 auto;position:relative;z-index:1;}
+.price-tabs{display:flex;gap:3px;background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:3px;width:fit-content;margin:0 auto 56px;}
+.price-tab{padding:9px 24px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:'Space Grotesk',sans-serif;transition:all .2s;}
+.price-tab.active{background:var(--s3);color:var(--text);}
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:960px;margin:0 auto;}
+.price-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;transition:border-color .2s,transform .2s;}
+.price-card:hover{transform:translateY(-3px);}
+.price-card.pop{border-color:var(--gold);}
+.price-card.pop-teal{border-color:var(--teal);}
+.pop-tag{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;font-family:'DM Mono',monospace;letter-spacing:.5px;white-space:nowrap;}
+.pop-tag-gold{background:var(--gold);color:#020509;}
+.pop-tag-teal{background:var(--teal);color:#020509;}
+.price-plan{font-size:13px;font-weight:700;letter-spacing:1px;font-family:'DM Mono',monospace;margin-bottom:4px;}
+.price-plan.gold{color:var(--gold);}
+.price-plan.teal{color:var(--teal);}
+.price-desc{font-size:12px;color:var(--muted);margin-bottom:20px;}
+.price-amount{font-size:44px;font-weight:700;letter-spacing:-1.5px;line-height:1;}
+.price-period{font-size:13px;color:var(--muted);font-weight:400;}
+.price-ngn{font-size:11px;color:var(--sub);font-family:'DM Mono',monospace;margin:4px 0 20px;}
+.price-feats{list-style:none;margin-bottom:24px;}
+.price-feats li{font-size:12px;padding:5px 0;color:var(--muted);display:flex;gap:7px;border-bottom:1px solid rgba(255,255,255,.03);}
+.price-feats li:last-child{border:none;}
+.price-feats li.on{color:var(--text);}
+.price-feats li::before{content:'—';color:var(--sub);flex-shrink:0;font-size:11px;margin-top:1px;}
+.price-feats li.on::before{content:'✓';color:var(--teal);}
+.btn-price{width:100%;padding:11px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;}
+.btn-price-ghost{background:transparent;border:1px solid var(--border2);color:var(--text);}
+.btn-price-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-price-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;color:#020509;}
+.btn-price-teal{background:linear-gradient(135deg,var(--teal),var(--teal2));border:none;color:#020509;}
+.btn-price-gold:hover,.btn-price-teal:hover{transform:translateY(-1px);}
+
+/* CTA */
+.cta{margin:0 64px 100px;border:1px solid var(--border2);border-radius:20px;padding:72px 64px;text-align:center;position:relative;overflow:hidden;z-index:1;background:linear-gradient(160deg,var(--s2),var(--bg));}
+.cta::before{content:'';position:absolute;top:-50%;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(245,184,0,0.07),transparent 65%);pointer-events:none;}
+.cta h2{font-size:clamp(36px,4vw,56px);font-weight:700;letter-spacing:-1.5px;margin-bottom:16px;position:relative;z-index:1;}
+.cta p{font-size:16px;color:var(--muted);margin-bottom:36px;position:relative;z-index:1;}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);z-index:500;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--border2);border-radius:20px;padding:36px;max-width:460px;width:90%;animation:popIn .25s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
+.modal-title{font-size:22px;font-weight:700;letter-spacing:-.5px;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;}
+.modal-plan-tag{font-family:'DM Mono',monospace;font-size:11px;margin-bottom:20px;padding:4px 10px;border-radius:4px;display:inline-block;}
+.tag-gold{background:rgba(245,184,0,0.1);color:var(--gold);}
+.tag-teal{background:rgba(0,212,170,0.1);color:var(--teal);}
+.form-row{margin-bottom:14px;}
+.form-row label{display:block;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.form-row input,.form-row select{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:11px 13px;color:var(--text);font-size:13px;font-family:'Space Grotesk',sans-serif;outline:none;transition:border-color .2s;}
+.form-row input:focus,.form-row select:focus{border-color:var(--gold);}
+.form-row select option{background:var(--s2);}
+.price-preview{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.preview-label{font-size:12px;color:var(--muted);}
+.preview-amount{font-size:26px;font-weight:700;color:var(--gold);}
+.preview-amount.teal{color:var(--teal);}
+.btn-pay{width:100%;padding:14px;border:none;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+.btn-pay-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#020509;}
+.btn-pay-teal{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#020509;}
+.btn-pay:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(245,184,0,0.25);}
+.pay-note{text-align:center;font-size:10px;color:var(--sub);margin-top:10px;font-family:'DM Mono',monospace;}
+
+/* Footer */
+footer{border-top:1px solid var(--border);padding:44px 64px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;position:relative;z-index:1;}
+.footer-brand{font-size:16px;font-weight:700;}
+.footer-brand span{color:var(--gold);}
+.footer-text{font-size:12px;color:var(--muted);}
+.footer-links{display:flex;gap:20px;}
+.footer-links a{font-size:12px;color:var(--muted);text-decoration:none;}
+.footer-links a:hover{color:var(--text);}
+
+@media(max-width:900px){
+  nav{padding:16px 20px;}.nav-links{display:none;}
+  .products,.pricing,.diff-section,.cta{padding:60px 20px;}
+  .cta{margin:0 20px 60px;}
+  .product-cards,.diff-grid,.price-grid{grid-template-columns:1fr;}
+  .feature-grid{grid-template-columns:1fr;}
+  .stats{flex-direction:column;}
+  .stat{border-right:none;border-bottom:1px solid var(--border);}
+  footer{padding:32px 20px;flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-orb1"></div>
+<div class="bg-orb2"></div>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo-icon">🛡</div>
+    <div class="nav-brand-name">Shield<span>Layer</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="#products">Products</a>
+    <a href="#why">Why Us</a>
+    <a href="#pricing">Pricing</a>
+    <a href="https://fraudshield-ai-i6x8.onrender.com" target="_blank">Live Demo</a>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-nav btn-ghost" onclick="openModal('goldenshield','Starter','9','13500')">Sign in</button>
+    <button class="btn-nav btn-gold" onclick="openModal('goldenshield','Starter','9','13500')">Get started free</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">🌍 AFRICA'S AI SECURITY INFRASTRUCTURE</div>
+  <h1>Stop Fraud &<br><em>Cyber Threats</em><br>Before They Strike</h1>
+  <p class="hero-sub">Two AI-powered security products purpose-built for African financial institutions and businesses. Real-time, explainable, and built for Nigeria.</p>
+  <div class="hero-ctas">
+    <button class="btn-hero-gold" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Explore products</button>
+    <button class="btn-hero-outline" onclick="window.open('https://fraudshield-ai-i6x8.onrender.com','_blank')">See live demo →</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-val gold">99.8%</div><div class="stat-label">Detection accuracy</div></div>
+    <div class="stat"><div class="stat-val teal">&lt;50ms</div><div class="stat-label">Response time</div></div>
+    <div class="stat"><div class="stat-val red">$4B+</div><div class="stat-label">Africa loses yearly to fraud</div></div>
+    <div class="stat"><div class="stat-val blue">2</div><div class="stat-label">AI security products</div></div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section id="products">
+<div class="products">
+  <div class="sec-label">Our products</div>
+  <div class="sec-title">Built Different.<br>Built for Africa.</div>
+  <div class="sec-sub">Not reskins of Western tools. Purpose-built for Nigerian transaction patterns, CBN compliance, and African threat landscapes.</div>
+
+  <div class="product-cards">
+    <!-- GoldenShield AI -->
+    <div class="product-card gold-card">
+      <div class="product-badge badge-gold">🔍 FRAUD DETECTION</div>
+      <div class="product-name">GoldenShield AI</div>
+      <div class="product-tagline">Explainable AI fraud detection trained on African transaction patterns. Know not just what's fraud — but exactly why, in plain English.</div>
+      <div class="feature-grid">
+        <div class="feat"><i>🧠</i> Explainable AI verdicts</div>
+        <div class="feat"><i>🇳🇬</i> Nigeria-specific patterns</div>
+        <div class="feat"><i>📱</i> WhatsApp alert integration</div>
+        <div class="feat"><i>🏦</i> CBN compliance reports</div>
+        <div class="feat"><i>🔗</i> Paystack/Flutterwave API</div>
+        <div class="feat"><i>📊</i> Fraud network graph</div>
+        <div class="feat"><i>⚡</i> Real-time &lt;50ms scoring</div>
+        <div class="feat"><i>🗂️</i> Batch CSV analysis</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-product btn-gold-fill" onclick="openModal('goldenshield','Business','49','73500')">Start free trial</button>
+        <a href="https://fraudshield-ai-i6x8.onrender.com" target="_blank" class="btn-product" style="background:rgba(245,184,0,0.1);border:1px solid rgba(245,184,0,0.2);color:var(--gold);">Live demo →</a>
+      </div>
+      <div class="product-glow gold-glow"></div>
+    </div>
+
+    <!-- GuardShield -->
+    <div class="product-card teal-card">
+      <div class="product-badge badge-teal">🛡️ CYBER MONITORING</div>
+      <div class="product-name">GuardShield</div>
+      <div class="product-tagline">Team-wide real-time threat monitoring with shared intelligence. When one device is attacked, everyone in your org is protected instantly.</div>
+      <div class="feature-grid">
+        <div class="feat"><i>👥</i> Team threat sharing</div>
+        <div class="feat"><i>📡</i> Live device scanning</div>
+        <div class="feat"><i>🤖</i> AI mitigation assistant</div>
+        <div class="feat"><i>📧</i> Weekly security reports</div>
+        <div class="feat"><i>🇳🇬</i> Nigeria threat intel</div>
+        <div class="feat"><i>🔔</i> Instant breach alerts</div>
+        <div class="feat"><i>🌐</i> Browser security audit</div>
+        <div class="feat"><i>📋</i> Step-by-step remediation</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-product btn-teal-fill" onclick="openModal('guardshield','Business','49','73500')">Start free trial</button>
+        <button class="btn-product" style="background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.2);color:var(--teal);cursor:pointer;" onclick="openModal('guardshield','Free','0','0')">Free plan →</button>
+      </div>
+      <div class="product-glow teal-glow"></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- WHY SHIELDLAYER -->
+<section id="why">
+<div class="diff-section">
+  <div class="diff-inner">
+    <div class="sec-label">Why ShieldLayer</div>
+    <div class="sec-title">What Makes Us<br>Different</div>
+    <div class="diff-grid">
+      <div class="diff-card">
+        <div class="diff-icon" style="background:rgba(245,184,0,0.1)">🧠</div>
+        <div class="diff-title">Explainable AI</div>
+        <div class="diff-text">Every fraud flag comes with a plain-English explanation of exactly why it was flagged. No black boxes. Your team understands every decision.</div>
+      </div>
+      <div class="diff-card">
+        <div class="diff-icon" style="background:rgba(0,212,170,0.1)">🇳🇬</div>
+        <div class="diff-title">Built for Nigeria</div>
+        <div class="diff-text">Trained on Nigerian fraud patterns — BVN fraud, POS skimming, SIM swap attacks, mobile money fraud. Not retrained Western models.</div>
+      </div>
+      <div class="diff-card">
+        <div class="diff-icon" style="background:rgba(0,119,255,0.1)">👥</div>
+        <div class="diff-title">Team Threat Sharing</div>
+        <div class="diff-text">When one device in your org is attacked, GuardShield instantly alerts and protects every other device. Collective intelligence, not isolated scans.</div>
+      </div>
+      <div class="diff-card">
+        <div class="diff-icon" style="background:rgba(255,58,58,0.1)">📱</div>
+        <div class="diff-title">WhatsApp Alerts</div>
+        <div class="diff-text">Critical fraud alerts delivered instantly to WhatsApp — where your team actually is. Not just email. Real-time, where it matters.</div>
+      </div>
+      <div class="diff-card">
+        <div class="diff-icon" style="background:rgba(245,184,0,0.1)">🏦</div>
+        <div class="diff-title">CBN Compliance</div>
+        <div class="diff-text">Auto-generated audit reports formatted for CBN, NDIC, and Nigerian regulatory requirements. One click to compliance documentation.</div>
+      </div>
+      <div class="diff-card">
+        <div class="diff-icon" style="background:rgba(0,212,170,0.1)">⚡</div>
+        <div class="diff-title">African Pricing</div>
+        <div class="diff-text">Priced in Naira. No dollar FX headaches. Plans designed for African startup budgets, with enterprise capability at SME prices.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+<div class="pricing">
+  <div style="text-align:center;margin-bottom:48px;">
+    <div class="sec-label" style="text-align:center">Pricing</div>
+    <div class="sec-title" style="text-align:center;font-size:clamp(32px,4vw,48px)">Start Free.<br>Scale With Confidence.</div>
+  </div>
+  <div class="price-tabs">
+    <button class="price-tab active" onclick="switchTab('goldenshield',this)">🔍 GoldenShield AI</button>
+    <button class="price-tab" onclick="switchTab('guardshield',this)">🛡️ GuardShield</button>
+  </div>
+
+  <!-- GoldenShield Pricing -->
+  <div id="tab-goldenshield" class="price-grid">
+    <div class="price-card">
+      <div class="price-plan gold">STARTER</div>
+      <div class="price-desc">Individuals & testing</div>
+      <div class="price-amount">$0<span class="price-period">/mo</span></div>
+      <div class="price-ngn">₦0 / month forever</div>
+      <ul class="price-feats">
+        <li class="on">1,000 API calls/month</li>
+        <li class="on">Single transaction scan</li>
+        <li class="on">Basic fraud dashboard</li>
+        <li>Batch CSV upload</li>
+        <li>WhatsApp alerts</li>
+        <li>CBN compliance reports</li>
+      </ul>
+      <button class="btn-price btn-price-ghost" onclick="openModal('goldenshield','Starter','0','0')">Get started free</button>
+    </div>
+    <div class="price-card pop">
+      <div class="pop-tag pop-tag-gold">MOST POPULAR</div>
+      <div class="price-plan gold">BUSINESS</div>
+      <div class="price-desc">Fintechs & financial institutions</div>
+      <div class="price-amount">$49<span class="price-period">/mo</span></div>
+      <div class="price-ngn">₦73,500 / month</div>
+      <ul class="price-feats">
+        <li class="on">50,000 API calls/month</li>
+        <li class="on">Full fraud dashboard</li>
+        <li class="on">Batch CSV upload</li>
+        <li class="on">WhatsApp alerts</li>
+        <li class="on">CBN compliance reports</li>
+        <li>Custom model training</li>
+      </ul>
+      <button class="btn-price btn-price-gold" onclick="openModal('goldenshield','Business','49','73500')">Start free trial</button>
+    </div>
+    <div class="price-card">
+      <div class="price-plan gold">ENTERPRISE</div>
+      <div class="price-desc">Banks & large institutions</div>
+      <div class="price-amount">$199<span class="price-period">/mo</span></div>
+      <div class="price-ngn">₦298,500 / month</div>
+      <ul class="price-feats">
+        <li class="on">Unlimited API calls</li>
+        <li class="on">Full fraud dashboard</li>
+        <li class="on">Batch CSV upload</li>
+        <li class="on">WhatsApp alerts</li>
+        <li class="on">CBN compliance reports</li>
+        <li class="on">Custom model training</li>
+      </ul>
+      <button class="btn-price btn-price-ghost" onclick="openModal('goldenshield','Enterprise','199','298500')">Contact sales</button>
+    </div>
+  </div>
+
+  <!-- GuardShield Pricing -->
+  <div id="tab-guardshield" class="price-grid" style="display:none">
+    <div class="price-card">
+      <div class="price-plan teal">STARTER</div>
+      <div class="price-desc">Individuals & small teams</div>
+      <div class="price-amount">$0<span class="price-period">/mo</span></div>
+      <div class="price-ngn">₦0 / month forever</div>
+      <ul class="price-feats">
+        <li class="on">Basic device scan</li>
+        <li class="on">5 alerts per day</li>
+        <li class="on">1 device monitored</li>
+        <li>Team threat sharing</li>
+        <li>WhatsApp alerts</li>
+        <li>Weekly security reports</li>
+      </ul>
+      <button class="btn-price btn-price-ghost" onclick="openModal('guardshield','Starter','0','0')">Get started free</button>
+    </div>
+    <div class="price-card pop-teal">
+      <div class="pop-tag pop-tag-teal">MOST POPULAR</div>
+      <div class="price-plan teal">BUSINESS</div>
+      <div class="price-desc">Startups & SMEs</div>
+      <div class="price-amount">$49<span class="price-period">/mo</span></div>
+      <div class="price-ngn">₦73,500 / month</div>
+      <ul class="price-feats">
+        <li class="on">Full device scanning</li>
+        <li class="on">Unlimited alerts</li>
+        <li class="on">10 devices monitored</li>
+        <li class="on">Team threat sharing</li>
+        <li class="on">WhatsApp alerts</li>
+        <li>Weekly security reports</li>
+      </ul>
+      <button class="btn-price btn-price-teal" onclick="openModal('guardshield','Business','49','73500')">Start free trial</button>
+    </div>
+    <div class="price-card">
+      <div class="price-plan teal">ENTERPRISE</div>
+      <div class="price-desc">Large organizations</div>
+      <div class="price-amount">$199<span class="price-period">/mo</span></div>
+      <div class="price-ngn">₦298,500 / month</div>
+      <ul class="price-feats">
+        <li class="on">Full device scanning</li>
+        <li class="on">Unlimited alerts</li>
+        <li class="on">Unlimited devices</li>
+        <li class="on">Team threat sharing</li>
+        <li class="on">WhatsApp alerts</li>
+        <li class="on">Weekly security reports</li>
+      </ul>
+      <button class="btn-price btn-price-ghost" onclick="openModal('guardshield','Enterprise','199','298500')">Contact sales</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- CTA -->
+<div class="cta">
+  <h2>Africa's Security<br>Infrastructure Starts Here</h2>
+  <p>Join the businesses protecting themselves with AI built for African realities.</p>
+  <div class="cta-btns">
+    <button class="btn-hero-gold" onclick="openModal('goldenshield','Business','49','73500')">Start free — GoldenShield AI</button>
+    <button class="btn-hero-outline" onclick="openModal('guardshield','Business','49','73500')">Start free — GuardShield</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">Shield<span>Layer</span></div>
+  <div class="footer-text">© 2026 ShieldLayer. Built in Nigeria 🇳🇬 for Africa 🌍</div>
+  <div class="footer-links">
+    <a href="https://fraudshield-ai-i6x8.onrender.com" target="_blank">GoldenShield Demo</a>
+    <a href="mailto:abuyus704@gmail.com">Contact</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+</footer>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modal-title">Get Started</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-plan-tag" id="modal-tag">GoldenShield AI · Business</div>
+    <div class="form-row"><label>Full name</label><input type="text" id="p-name" placeholder="Your full name"></div>
+    <div class="form-row"><label>Email</label><input type="email" id="p-email" placeholder="you@company.com"></div>
+    <div class="form-row"><label>Organization</label><input type="text" id="p-org" placeholder="Company name"></div>
+    <div class="form-row"><label>Currency</label>
+      <select id="p-currency" onchange="updateAmt()">
+        <option value="NGN">Nigerian Naira (₦)</option>
+        <option value="USD">US Dollar ($)</option>
+        <option value="GHS">Ghana Cedi (GH₵)</option>
+        <option value="KES">Kenyan Shilling (KSh)</option>
+      </select>
+    </div>
+    <div class="price-preview">
+      <div class="preview-label" id="p-label">Monthly subscription</div>
+      <div class="preview-amount" id="p-amount">₦73,500</div>
+    </div>
+    <button class="btn-pay btn-pay-gold" id="p-btn" onclick="pay()">🔒 Pay with Paystack</button>
+    <div class="pay-note">Secured by Paystack · SSL encrypted · Cancel anytime</div>
+  </div>
+</div>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+let cProduct='',cPlan='',cUSD=0,cNGN=0;
+const rates={NGN:1500,GHS:15,KES:130};
+const syms={NGN:'₦',USD:'$',GHS:'GH₵',KES:'KSh'};
+function switchTab(t,btn){
+  ['goldenshield','guardshield'].forEach(id=>{
+    document.getElementById('tab-'+id).style.display=id===t?'grid':'none';
+  });
+  document.querySelectorAll('.price-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function openModal(product,plan,usd,ngn){
+  cProduct=product;cPlan=plan;cUSD=parseFloat(usd);cNGN=parseFloat(ngn);
+  const pName=product==='goldenshield'?'GoldenShield AI':'GuardShield';
+  const isGold=product==='goldenshield';
+  document.getElementById('modal-title').textContent=plan==='Starter'&&usd==='0'?'Create free account':'Complete purchase';
+  document.getElementById('modal-tag').textContent=pName+' · '+plan;
+  document.getElementById('modal-tag').className='modal-plan-tag '+(isGold?'tag-gold':'tag-teal');
+  document.getElementById('p-amount').className='preview-amount '+(isGold?'':'teal');
+  document.getElementById('p-btn').className='btn-pay '+(isGold?'btn-pay-gold':'btn-pay-teal');
+  updateAmt();
+  document.getElementById('modal').classList.add('open');
+}
+function updateAmt(){
+  const c=document.getElementById('p-currency').value;
+  if(cUSD===0){document.getElementById('p-amount').textContent='FREE';document.getElementById('p-label').textContent='No payment required';return;}
+  let a=c==='USD'?cUSD:c==='NGN'?cNGN:Math.round(cUSD*rates[c]);
+  document.getElementById('p-amount').textContent=syms[c]+a.toLocaleString();
+  document.getElementById('p-label').textContent='Monthly subscription';
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function pay(){
+  const name=document.getElementById('p-name').value.trim();
+  const email=document.getElementById('p-email').value.trim();
+  const org=document.getElementById('p-org').value.trim();
+  const c=document.getElementById('p-currency').value;
+  if(!name||!email){alert('Please enter name and email.');return;}
+  if(!email.includes('@')){alert('Invalid email.');return;}
+  if(cUSD===0){alert('Welcome to ShieldLayer! Check '+email+' for your free account.');closeModal();return;}
+  let kobo=c==='NGN'?cNGN*100:c==='USD'?cUSD*100:Math.round(cUSD*rates[c])*100;
+  const pName=cProduct==='goldenshield'?'GoldenShield AI':'GuardShield';
+  const handler=PaystackPop.setup({
+    key:'pk_test_YOUR_PAYSTACK_PUBLIC_KEY_HERE',
+    email,amount:kobo,
+    currency:c==='USD'?'USD':c==='GHS'?'GHS':c==='KES'?'KES':'NGN',
+    ref:'SL_'+Date.now(),
+    metadata:{custom_fields:[{display_name:'Name',variable_name:'name',value:name},{display_name:'Org',variable_name:'org',value:org},{display_name:'Product',variable_name:'product',value:pName},{display_name:'Plan',variable_name:'plan',value:cPlan}]},
+    callback:r=>{closeModal();alert('✅ Payment successful!\nRef: '+r.reference+'\n\nWelcome to '+pName+' '+cPlan+'!\nCheck '+email+' for your account.');},
+    onClose:()=>{}
+  });
+  handler.openIframe();
+}
+</script>
+</body>
+</html>

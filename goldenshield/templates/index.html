@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoldenShield AI — African Fraud Detection</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root{--bg:#020509;--s1:#060d14;--s2:#0a1520;--s3:#0f1e2e;--border:#162030;--border2:#1d2e42;--gold:#f5b800;--gold2:#ff8c00;--teal:#00d4aa;--red:#ef4444;--warn:#f59e0b;--text:#ddeeff;--muted:#4a6a8a;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(245,184,0,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(245,184,0,0.02) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
+
+header{border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(2,5,9,0.9);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo-name{font-weight:700;font-size:17px;}
+.logo-name span{color:var(--gold);}
+.header-right{display:flex;align-items:center;gap:12px;}
+.live-badge{display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--teal);}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.btn-scan{padding:9px 18px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:8px;color:#020509;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-scan:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(245,184,0,0.3);}
+.btn-sec{padding:9px 18px;background:var(--s2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;}
+.btn-sec:hover{border-color:var(--gold);}
+
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 65px);}
+nav{border-right:1px solid var(--border);padding:16px 0;background:rgba(6,13,20,.5);}
+.nav-sec{padding:0 10px;margin-bottom:20px;}
+.nav-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-family:'DM Mono',monospace;padding:0 8px;margin-bottom:6px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:2px;}
+.nav-item:hover{background:var(--s2);color:var(--text);}
+.nav-item.active{background:rgba(245,184,0,0.1);color:var(--gold);}
+.nav-item i{font-size:15px;}
+.nav-badge{margin-left:auto;background:var(--red);color:white;font-size:9px;padding:2px 5px;border-radius:8px;font-family:'DM Mono',monospace;}
+.side-score{padding:12px;background:var(--s2);border:1px solid var(--border);border-radius:10px;margin:0 8px;text-align:center;}
+.side-score-num{font-size:36px;font-weight:700;color:var(--gold);}
+.side-score-lbl{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;}
+
+main{padding:20px;overflow-y:auto;}
+.page{display:none;}
+.page.active{display:block;}
+
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.metric{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;}
+.metric::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.m-gold::before{background:linear-gradient(90deg,var(--gold),var(--gold2));}
+.m-red::before{background:var(--red);}
+.m-teal::before{background:var(--teal);}
+.m-blue::before{background:#0077ff;}
+.metric-lbl{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.metric-val{font-size:26px;font-weight:700;}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px;}
+.card-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.card-title .dot{width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 5px var(--gold);}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.field label{display:block;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.field input,.field select{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'DM Mono',monospace;outline:none;transition:border-color .2s;}
+.field input:focus,.field select:focus{border-color:var(--gold);}
+.field select option{background:var(--s2);}
+
+.result-panel{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:18px;margin-top:14px;display:none;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.verdict-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.verdict-text{font-size:18px;font-weight:700;}
+.risk-pill{font-size:11px;padding:4px 10px;border-radius:20px;font-family:'DM Mono',monospace;font-weight:700;}
+.score-bar-wrap{margin-bottom:14px;}
+.score-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;font-family:'DM Mono',monospace;}
+.score-bar{height:7px;background:var(--s3);border-radius:4px;overflow:hidden;}
+.score-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1);}
+
+.explain-section{margin-bottom:14px;}
+.explain-title{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.explain-item{display:flex;gap:8px;font-size:12px;color:var(--muted);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03);}
+.explain-item:last-child{border:none;}
+.explain-item i{flex-shrink:0;font-size:13px;color:var(--warn);}
+
+.nigeria-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(245,184,0,.1);border:1px solid rgba(245,184,0,.2);color:var(--gold);font-size:10px;padding:3px 8px;border-radius:4px;font-family:'DM Mono',monospace;margin:3px 2px;letter-spacing:.3px;}
+
+.whatsapp-preview{background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);border-radius:10px;padding:12px;font-family:'DM Mono',monospace;font-size:11px;color:#25d366;line-height:1.6;margin-top:10px;white-space:pre-wrap;}
+
+.action-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.btn-action{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;border:1px solid var(--border2);background:transparent;color:var(--text);}
+.btn-action:hover{border-color:var(--gold);color:var(--gold);}
+.btn-action-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;color:#020509;}
+.btn-action-gold:hover{transform:translateY(-1px);}
+
+.scenarios{display:flex;flex-direction:column;gap:9px;}
+.scenario{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;}
+.scenario:hover{border-color:var(--gold);}
+.scenario-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.scenario-name{font-size:13px;font-weight:600;}
+.scenario-desc{font-size:11px;color:var(--muted);}
+
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{padding:10px 12px;text-align:left;font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:1px solid var(--border);}
+td{padding:10px 12px;border-bottom:1px solid rgba(22,32,48,.5);font-family:'DM Mono',monospace;}
+tr:hover td{background:rgba(255,255,255,.02);}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.3px;}
+.pill-high{background:rgba(239,68,68,.15);color:#ef4444;}
+.pill-med{background:rgba(245,158,11,.15);color:#f59e0b;}
+.pill-low{background:rgba(0,212,170,.15);color:#00d4aa;}
+.pill-fraud{background:rgba(239,68,68,.2);color:#f87171;}
+.pill-legit{background:rgba(0,212,170,.2);color:#34d399;}
+
+.cbn-card{background:rgba(245,184,0,.05);border:1px solid rgba(245,184,0,.2);border-radius:12px;padding:16px;margin-top:14px;}
+.cbn-title{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px;font-family:'DM Mono',monospace;}
+.cbn-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(245,184,0,.08);}
+.cbn-row:last-child{border:none;}
+.cbn-key{color:var(--muted);}
+.cbn-val{color:var(--text);font-family:'DM Mono',monospace;}
+
+.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(2,5,9,.3);border-top-color:#020509;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:768px){.layout{grid-template-columns:1fr;}nav{display:none;}.metrics{grid-template-columns:repeat(2,1fr);}.grid2{grid-template-columns:1fr;}.form-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-icon">🔍</div>
+    <div class="logo-name">Golden<span>Shield</span> AI</div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge"><span class="pulse"></span> Monitoring active</div>
+    <button class="btn-sec" onclick="switchPage('demo')">Live Demo</button>
+    <button class="btn-scan" onclick="document.getElementById('analyzeBtn').click()">Analyze Transaction</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav>
+    <div class="nav-sec">
+      <div class="nav-lbl">Detect</div>
+      <div class="nav-item active" onclick="switchPage('dashboard',this)"><i class="ti ti-dashboard"></i> Dashboard</div>
+      <div class="nav-item" onclick="switchPage('analyze',this)"><i class="ti ti-search"></i> Analyze</div>
+      <div class="nav-item" onclick="switchPage('batch',this)"><i class="ti ti-table"></i> Batch Upload</div>
+      <div class="nav-item" onclick="switchPage('demo',this)"><i class="ti ti-player-play"></i> Live Demo</div>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Intelligence</div>
+      <div class="nav-item" onclick="switchPage('network',this)"><i class="ti ti-network"></i> Fraud Network</div>
+      <div class="nav-item" onclick="switchPage('compliance',this)"><i class="ti ti-certificate"></i> CBN Reports</div>
+    </div>
+    <div class="nav-sec">
+      <div class="side-score">
+        <div class="side-score-num" id="sideScore">--</div>
+        <div class="side-score-lbl">FRAUD RISK INDEX</div>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Dashboard -->
+    <div class="page active" id="page-dashboard">
+      <div class="metrics">
+        <div class="metric m-gold"><div class="metric-lbl">Model Accuracy</div><div class="metric-val" style="color:var(--gold)">99.8%</div><div class="metric-sub">On test dataset</div></div>
+        <div class="metric m-red"><div class="metric-lbl">Fraud Recall</div><div class="metric-val" style="color:var(--red)">98%</div><div class="metric-sub">Frauds caught</div></div>
+        <div class="metric m-teal"><div class="metric-lbl">Response Time</div><div class="metric-val" style="color:var(--teal)">&lt;50ms</div><div class="metric-sub">Per transaction</div></div>
+        <div class="metric m-blue"><div class="metric-lbl">Training Data</div><div class="metric-val">10K+</div><div class="metric-sub">Transactions</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title"><span class="dot"></span> Nigeria Fraud Patterns Detected</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--s2);border-radius:8px;font-size:13px;"><span>SIM Swap Attacks</span><span class="pill pill-high">HIGH</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--s2);border-radius:8px;font-size:13px;"><span>POS Skimming</span><span class="pill pill-med">MEDIUM</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--s2);border-radius:8px;font-size:13px;"><span>Mobile Money Mules</span><span class="pill pill-high">HIGH</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--s2);border-radius:8px;font-size:13px;"><span>BVN Identity Fraud</span><span class="pill pill-med">MEDIUM</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--s2);border-radius:8px;font-size:13px;"><span>Account Takeover</span><span class="pill pill-low">LOW</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="dot"></span> What Makes GoldenShield Different</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--muted);">
+            <div style="padding:8px;background:var(--s2);border-radius:8px;border-left:2px solid var(--gold);">🧠 <strong style="color:var(--text)">Explainable AI</strong> — every flag comes with plain-English reasons</div>
+            <div style="padding:8px;background:var(--s2);border-radius:8px;border-left:2px solid var(--gold);">🇳🇬 <strong style="color:var(--text)">Nigeria patterns</strong> — trained on local fraud signatures</div>
+            <div style="padding:8px;background:var(--s2);border-radius:8px;border-left:2px solid var(--gold);">📱 <strong style="color:var(--text)">WhatsApp alerts</strong> — reach your team where they are</div>
+            <div style="padding:8px;background:var(--s2);border-radius:8px;border-left:2px solid var(--gold);">🏦 <strong style="color:var(--text)">CBN reports</strong> — one-click compliance documentation</div>
+            <div style="padding:8px;background:var(--s2);border-radius:8px;border-left:2px solid var(--gold);">🔗 <strong style="color:var(--text)">Paystack/Flutterwave API</strong> — direct integration</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> Quick Scenarios — Click to Analyze</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+          <div class="scenario" onclick="loadScenario('legit')"><div class="scenario-head"><span class="scenario-name">✅ Normal Payment</span><span class="pill pill-low">LOW</span></div><div class="scenario-desc">₦15,000 · Business hours · Regular device</div></div>
+          <div class="scenario" onclick="loadScenario('simswap')"><div class="scenario-head"><span class="scenario-name">⚠️ SIM Swap Pattern</span><span class="pill pill-high">HIGH</span></div><div class="scenario-desc">New device + location change + late night</div></div>
+          <div class="scenario" onclick="loadScenario('fraud')"><div class="scenario-head"><span class="scenario-name">🚨 Fraud Detected</span><span class="pill pill-high">HIGH</span></div><div class="scenario-desc">₦450K · 2AM · New account · Multiple fails</div></div>
+        </div>
+        <div id="quickResult" style="margin-top:14px;display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Analyze Page -->
+    <div class="page" id="page-analyze">
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title"><span class="dot"></span> Transaction Analysis</div>
+          <div class="form-grid">
+            <div class="field"><label>Amount (₦)</label><input type="number" id="amount" value="25000"></div>
+            <div class="field"><label>Hour (0-23)</label><input type="number" id="hour" value="14" min="0" max="23"></div>
+            <div class="field"><label>Day of Week</label><select id="day_of_week"><option value="0">Monday</option><option value="1">Tuesday</option><option value="2">Wednesday</option><option value="3">Thursday</option><option value="4" selected>Friday</option><option value="5">Saturday</option><option value="6">Sunday</option></select></div>
+            <div class="field"><label>Transactions Today</label><input type="number" id="num_transactions_today" value="3"></div>
+            <div class="field"><label>Avg Amount (₦)</label><input type="number" id="avg_transaction_amount" value="18000"></div>
+            <div class="field"><label>Account Age (Days)</label><input type="number" id="account_age_days" value="365"></div>
+            <div class="field"><label>Failed Attempts</label><input type="number" id="failed_attempts" value="0" min="0" max="10"></div>
+            <div class="field"><label>International?</label><select id="is_international"><option value="0" selected>No</option><option value="1">Yes</option></select></div>
+            <div class="field"><label>New Device?</label><select id="device_change"><option value="0" selected>No</option><option value="1">Yes</option></select></div>
+            <div class="field"><label>Location Change?</label><select id="location_change"><option value="0" selected>No</option><option value="1">Yes</option></select></div>
+          </div>
+          <button class="btn-scan" style="width:100%;padding:12px;" onclick="analyze()" id="analyzeBtn">Analyze with GoldenShield AI →</button>
+          <div class="result-panel" id="resultPanel">
+            <div class="verdict-row"><div class="verdict-text" id="verdictText"></div><div class="risk-pill" id="riskPill"></div></div>
+            <div class="score-bar-wrap"><div class="score-lbl"><span>Fraud Probability</span><span id="scoreText"></span></div><div class="score-bar"><div class="score-fill" id="scoreFill" style="width:0%"></div></div></div>
+            <div class="explain-section">
+              <div class="explain-title">🧠 Why this was flagged (Explainable AI)</div>
+              <div id="explanationList"></div>
+            </div>
+            <div id="nigeriaPatterns"></div>
+            <div id="whatsappAlert"></div>
+            <div class="action-row" id="actionRow"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="dot"></span> Top Risk Factors</div>
+          <div id="factorsList"><div style="color:var(--muted);font-size:13px;padding:20px;text-align:center;">Run analysis to see risk factors</div></div>
+          <div style="margin-top:16px;">
+            <div class="card-title"><span class="dot"></span> Quick Scenarios</div>
+            <div class="scenarios">
+              <div class="scenario" onclick="loadScenario('legit')"><div class="scenario-head"><span class="scenario-name">✅ Legitimate Payment</span><span class="pill pill-low">LOW RISK</span></div><div class="scenario-desc">₦15,000 · Business hours · Regular device · Local</div></div>
+              <div class="scenario" onclick="loadScenario('simswap')"><div class="scenario-head"><span class="scenario-name">⚠️ SIM Swap Pattern</span><span class="pill pill-high">HIGH RISK</span></div><div class="scenario-desc">New device + location change + 2AM + international</div></div>
+              <div class="scenario" onclick="loadScenario('fraud')"><div class="scenario-head"><span class="scenario-name">🚨 Obvious Fraud</span><span class="pill pill-high">HIGH RISK</span></div><div class="scenario-desc">₦450,000 · 2AM · New account · Multiple fails</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo Page -->
+    <div class="page" id="page-demo">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> Live Demo — Pre-analyzed Transactions</div>
+        <button class="btn-scan" style="margin-bottom:20px;" onclick="loadDemo()">Run Demo Analysis →</button>
+        <div id="demoResults"></div>
+      </div>
+    </div>
+
+    <!-- Network Page -->
+    <div class="page" id="page-network">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> Fraud Network Graph Analysis</div>
+        <button class="btn-scan" style="margin-bottom:20px;" onclick="loadNetwork()">Analyze Fraud Networks →</button>
+        <div id="networkResults"></div>
+      </div>
+    </div>
+
+    <!-- Compliance Page -->
+    <div class="page" id="page-compliance">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> CBN Compliance Reports</div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Generate CBN-formatted Suspicious Activity Reports (SARs) and AML/CFT compliance documentation.</p>
+        <button class="btn-scan" onclick="loadDemo().then(generateCBN)" style="margin-bottom:20px;">Generate CBN Report →</button>
+        <div id="cbnReport"></div>
+      </div>
+    </div>
+
+    <!-- Batch Page -->
+    <div class="page" id="page-batch">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> Batch Transaction Analysis</div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Upload CSV to analyze multiple transactions at once with full CBN report generation.</p>
+        <div style="border:2px dashed var(--border2);border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:all .2s;" onclick="document.getElementById('fileInput').click()" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'">
+          <div style="font-size:32px;margin-bottom:10px;">📂</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Drop CSV file here</div>
+          <div style="font-size:12px;color:var(--muted);">Supports up to 10,000 rows</div>
+          <input type="file" id="fileInput" accept=".csv" style="display:none" onchange="handleBatch(event)">
+        </div>
+        <button class="btn-sec" style="margin-top:12px;" onclick="downloadSample()">⬇ Download Sample CSV</button>
+        <div id="batchResults" style="margin-top:16px;display:none;"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const scenarios={
+  legit:{amount:15000,hour:14,day_of_week:2,num_transactions_today:4,avg_transaction_amount:12000,account_age_days:730,failed_attempts:0,is_international:0,device_change:0,location_change:0},
+  simswap:{amount:180000,hour:2,day_of_week:6,num_transactions_today:8,avg_transaction_amount:10000,account_age_days:45,failed_attempts:1,is_international:1,device_change:1,location_change:1},
+  fraud:{amount:450000,hour:2,day_of_week:6,num_transactions_today:25,avg_transaction_amount:5000,account_age_days:7,failed_attempts:3,is_international:1,device_change:1,location_change:1}
+};
+
+function switchPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+  if(id==='demo') loadDemo();
+  if(id==='network') loadNetwork();
+  if(id==='compliance') generateCBNAuto();
+}
+
+function loadScenario(type){
+  const s=scenarios[type];
+  Object.keys(s).forEach(k=>{const el=document.getElementById(k);if(el)el.value=s[k];});
+  switchPage('analyze');
+  setTimeout(()=>analyze(),100);
+}
+
+async function analyze(){
+  const btn=document.getElementById('analyzeBtn');
+  btn.innerHTML='<span class="loader"></span>Analyzing...';
+  btn.disabled=true;
+  const fields=['amount','hour','day_of_week','num_transactions_today','avg_transaction_amount','account_age_days','failed_attempts','is_international','device_change','location_change'];
+  const data={};
+  fields.forEach(f=>data[f]=parseFloat(document.getElementById(f)?.value)||0);
+  try{
+    const res=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const r=await res.json();
+    showResult(r);
+    document.getElementById('sideScore').textContent=r.fraud_score+'%';
+  }catch(e){alert('Error: '+e.message);}
+  btn.innerHTML='Analyze with GoldenShield AI →';
+  btn.disabled=false;
+}
+
+function showResult(r){
+  const panel=document.getElementById('resultPanel');
+  panel.style.display='block';
+  document.getElementById('verdictText').textContent=r.is_fraud?'🚨 FRAUD DETECTED':'✅ LEGITIMATE';
+  document.getElementById('verdictText').style.color=r.is_fraud?'#ef4444':'#00d4aa';
+  const pill=document.getElementById('riskPill');
+  pill.textContent=r.risk_level+' RISK';
+  pill.style.background=r.risk_color+'22';
+  pill.style.color=r.risk_color;
+  pill.style.border=`1px solid ${r.risk_color}55`;
+  document.getElementById('scoreText').textContent=r.fraud_score+'%';
+  const fill=document.getElementById('scoreFill');
+  setTimeout(()=>{fill.style.width=r.fraud_score+'%';fill.style.background=`linear-gradient(90deg,${r.risk_color},${r.risk_color}aa)`;},50);
+
+  // Explainable AI
+  const ex=r.explanation||{};
+  document.getElementById('explanationList').innerHTML=(ex.reasons||[]).map(reason=>
+    `<div class="explain-item"><i class="ti ti-alert-circle"></i><span>${reason}</span></div>`
+  ).join('')||'<div style="color:var(--muted);font-size:12px;padding:6px 0;">No significant risk factors detected</div>';
+
+  // Nigeria patterns
+  const np=r.nigeria_patterns||[];
+  document.getElementById('nigeriaPatterns').innerHTML=np.length?`<div style="margin-top:10px;"><div class="explain-title">🇳🇬 Nigeria-Specific Patterns</div><div>${np.map(p=>`<span class="nigeria-tag">⚠️ ${p}</span>`).join('')}</div></div>`:'';
+
+  // WhatsApp
+  document.getElementById('whatsappAlert').innerHTML=r.whatsapp_alert?`<div style="margin-top:10px;"><div class="explain-title">📱 WhatsApp Alert Preview</div><div class="whatsapp-preview">${r.whatsapp_alert}</div></div>`:'';
+
+  // Factors
+  document.getElementById('factorsList').innerHTML=(r.top_factors||[]).map(f=>`
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px;font-family:'DM Mono',monospace;"><span>${f.feature}</span><span style="color:var(--gold)">${f.importance}% weight</span></div>
+      <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${f.importance}%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;"></div></div>
+    </div>`).join('');
+
+  // Quick result for dashboard
+  const qr=document.getElementById('quickResult');
+  if(qr){qr.style.display='block';qr.innerHTML=`<div style="padding:12px;background:var(--s2);border:1px solid ${r.risk_color}44;border-radius:10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;color:${r.risk_color}">${r.is_fraud?'🚨 FRAUD DETECTED':'✅ LEGITIMATE'}</span><span style="font-family:'DM Mono',monospace;font-size:12px;color:${r.risk_color}">${r.fraud_score}% fraud probability</span></div>`;}
+
+  // Action buttons
+  document.getElementById('actionRow').innerHTML=`
+    <button class="btn-action btn-action-gold" onclick="switchPage('compliance')">Generate CBN Report</button>
+    <button class="btn-action" onclick="alert('WhatsApp alert would be sent to: ${r.is_fraud?'+234XXXXXXXXXX':'your team'}\n\n'+document.querySelector('.whatsapp-preview')?.textContent)">📱 Send WhatsApp Alert</button>`;
+}
+
+async function loadDemo(){
+  try{
+    const res=await fetch('/api/demo');
+    const data=await res.json();
+    document.getElementById('demoResults').innerHTML=`
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+        <div style="background:var(--s2);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:24px;font-weight:700;">${data.total}</div><div style="font-size:11px;color:var(--muted)">Total</div></div>
+        <div style="background:var(--s2);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--red)">${data.fraud_count}</div><div style="font-size:11px;color:var(--muted)">Fraud</div></div>
+        <div style="background:var(--s2);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--teal)">${data.legitimate_count}</div><div style="font-size:11px;color:var(--muted)">Legitimate</div></div>
+      </div>
+      <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
+        <table><thead><tr><th>#</th><th>Amount (₦)</th><th>Hour</th><th>Txns Today</th><th>Intl?</th><th>Fraud Score</th><th>Risk</th><th>Verdict</th></tr></thead>
+        <tbody>${(data.results||[]).map((r,i)=>`<tr><td style="color:var(--muted)">${i+1}</td><td>₦${Number(r.amount).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')}</td><td>${r.hour}:00</td><td>${r.num_transactions_today}</td><td>${r.is_international?'🌍':'🏠'}</td><td style="color:${r.risk_level==='HIGH'?'#ef4444':r.risk_level==='MEDIUM'?'#f59e0b':'#00d4aa'}">${r.fraud_score}%</td><td><span class="pill pill-${r.risk_level.toLowerCase()}">${r.risk_level}</span></td><td><span class="pill ${r.prediction===1?'pill-fraud':'pill-legit'}">${r.prediction===1?'FRAUD':'LEGIT'}</span></td></tr>`).join('')}
+        </tbody></table>
+      </div>`;
+    return data;
+  }catch(e){console.error(e);}
+}
+
+async function loadNetwork(){
+  try{
+    const res=await fetch('/api/network');
+    const data=await res.json();
+    document.getElementById('networkResults').innerHTML=`
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+        <div style="background:var(--s2);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--red)">${data.nodes?.length||0}</div><div style="font-size:11px;color:var(--muted)">Suspicious Accounts</div></div>
+        <div style="background:var(--s2);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--warn)">${data.edges?.length||0}</div><div style="font-size:11px;color:var(--muted)">Connections</div></div>
+        <div style="background:var(--s2);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--gold)">₦${((data.total_exposure_ngn||0)/1000000).toFixed(1)}M</div><div style="font-size:11px;color:var(--muted)">Total Exposure</div></div>
+      </div>
+      ${(data.clusters||[]).map(c=>`<div style="background:var(--s2);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">🕸️ ${c.pattern}</div><div style="font-size:11px;color:var(--muted)">${c.accounts} accounts linked</div></div><div style="text-align:right;"><div style="font-size:14px;font-weight:700;color:var(--red)">₦${(c.total_fraud/1000000).toFixed(1)}M</div><div style="font-size:10px;color:var(--muted)">exposure</div></div></div>`).join('')}`;
+  }catch(e){console.error(e);}
+}
+
+async function generateCBNAuto(){
+  document.getElementById('cbnReport').innerHTML='<div style="color:var(--muted);font-size:13px;">Run a batch analysis first to generate CBN reports, or click the button above for a sample report.</div>';
+}
+
+function handleBatch(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  const form=new FormData();
+  form.append('file',file);
+  fetch('/api/batch',{method:'POST',body:form}).then(r=>r.json()).then(data=>{
+    document.getElementById('batchResults').style.display='block';
+    document.getElementById('batchResults').innerHTML=`
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+        <div style="background:var(--s2);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:24px;font-weight:700;">${data.total}</div><div style="font-size:11px;color:var(--muted)">Total</div></div>
+        <div style="background:var(--s2);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--red)">${data.fraud_count}</div><div style="font-size:11px;color:var(--muted)">Fraud Detected</div></div>
+        <div style="background:var(--s2);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--teal)">${data.legitimate_count}</div><div style="font-size:11px;color:var(--muted)">Legitimate</div></div>
+      </div>
+      ${data.cbn_report?`<div class="cbn-card"><div class="cbn-title">📋 CBN COMPLIANCE REPORT — ${data.cbn_report.report_id}</div>
+        <div class="cbn-row"><span class="cbn-key">Reporting Period</span><span class="cbn-val">${data.cbn_report.reporting_period}</span></div>
+        <div class="cbn-row"><span class="cbn-key">Transactions Flagged</span><span class="cbn-val" style="color:var(--red)">${data.cbn_report.summary?.transactions_flagged}</span></div>
+        <div class="cbn-row"><span class="cbn-key">Flag Rate</span><span class="cbn-val">${data.cbn_report.summary?.flag_rate_pct}%</span></div>
+        <div class="cbn-row"><span class="cbn-key">Fraud Exposure</span><span class="cbn-val" style="color:var(--red)">₦${(data.cbn_report.summary?.fraud_exposure_ngn||0).toLocaleString()}</span></div>
+        <div class="cbn-row"><span class="cbn-key">CBN AML Status</span><span class="cbn-val" style="color:var(--teal)">${data.cbn_report.regulatory_status?.cbn_aml_compliance}</span></div>
+        <div class="cbn-row"><span class="cbn-key">SAR Count</span><span class="cbn-val">${data.cbn_report.regulatory_status?.suspicious_activity_reports}</span></div>
+        <div style="margin-top:10px;font-size:11px;color:var(--muted)">${data.cbn_report.recommendation}</div>
+      </div>`:''}`;
+  });
+}
+
+function downloadSample(){
+  const csv=`amount,hour,day_of_week,num_transactions_today,avg_transaction_amount,account_age_days,failed_attempts,is_international,device_change,location_change\n25000,14,2,3,18000,365,0,0,0,0\n450000,2,6,25,5000,7,3,1,1,1\n8500,10,1,2,9000,1200,0,0,0,0\n120000,23,5,18,7000,30,2,1,1,1\n15000,9,3,5,14000,500,0,0,0,0`;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='goldenshield_sample.csv';a.click();
+}
+</script>
+</body>
+</html>
